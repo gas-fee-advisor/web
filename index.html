@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solana MetaMask Snap Connect</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #1a1a1a; color: white; }
+        button { padding: 12px 24px; font-size: 16px; background-color: #8c00ff; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; font-weight: bold;}
+        button:hover { background-color: #7300d1; }
+        #addressCard { margin-top: 20px; padding: 15px; background: #2a2a2a; border-radius: 8px; word-break: break-all; max-width: 400px; display: none; text-align: center; border: 1px solid #444; }
+    </style>
+</head>
+<body>
+
+    <h1>Connect Solana via MetaMask Snap</h1>
+    <p>अपने MetaMask का उपयोग करके Solana वॉलेट एड्रेस प्राप्त करें।</p>
+    
+    <button id="connectSnap">Connect & Get SOL Address</button>
+
+    <div id="addressCard">
+        <strong>Your Solana Address:</strong>
+        <p id="solAddress">Loading...</p>
+    </div>
+
+    <script>
+        
+        
+
+        document.getElementById('connectSnap').addEventListener('click', async () => {
+            if (!window.ethereum) {
+                alert('कृपया पहले MetaMask इंस्टॉल करें!');
+                return;
+            }
+
+            try {
+                // 1. Snap को इंस्टॉल या कनेक्ट करना
+                await window.ethereum.request({
+                    method: 'wallet_requestSnaps',
+                    params: {
+                        [snapId]: {}
+                    }
+                });
+
+                // 2. Snap से Solana एड्रेस मांगना (RPC Call)
+                const result = await window.ethereum.request({
+                    method: 'wallet_invokeSnap',
+                    params: {
+                        snapId,
+                        request: { method: 'get_solana_address' }
+                    }
+                });
+
+                if (result) {
+                    document.getElementById('addressCard').style.display = 'block';
+                    document.getElementById('solAddress').innerText = result;
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert('कनेक्ट करने में एरर आया: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
